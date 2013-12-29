@@ -38,6 +38,8 @@ int HOST = 0;
 
 static const char *adb_device_banner = "sideload";
 
+char ADB_SIDELOAD_FILENAME[255];
+
 void fatal(const char *fmt, ...)
 {
     va_list ap;
@@ -376,8 +378,9 @@ static void adb_cleanup(void)
     usb_cleanup();
 }
 
-int adb_main()
+int adb_main(const char* path)
 {
+	strcpy(ADB_SIDELOAD_FILENAME, path);
     atexit(adb_cleanup);
 #if defined(HAVE_FORKEXEC)
     // No SIGCHLD. Let the service subproc handle its children.
@@ -392,6 +395,7 @@ int adb_main()
         usb_init();
     }
 
+/* Remove this so that perms work properly
     if (setgid(AID_SHELL) != 0) {
         fprintf(stderr, "failed to setgid to shell\n");
         exit(1);
@@ -400,8 +404,9 @@ int adb_main()
         fprintf(stderr, "failed to setuid to shell\n");
         exit(1);
     }
-    fprintf(stderr, "userid is %d\n", getuid());
 
+    fprintf(stderr, "userid is %d\n", getuid());
+*/
     D("Event loop starting\n");
 
     fdevent_loop();

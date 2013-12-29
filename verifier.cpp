@@ -26,7 +26,9 @@
 #include <stdio.h>
 #include <errno.h>
 
-extern RecoveryUI* ui;
+//extern RecoveryUI* ui;
+
+#define PUBLIC_KEYS_FILE "/res/keys"
 
 // Look for an RSA signature embedded in the .ZIP file comment given
 // the path to the zip.  Verify it matches one of the given public
@@ -34,9 +36,16 @@ extern RecoveryUI* ui;
 //
 // Return VERIFY_SUCCESS, VERIFY_FAILURE (if any error is encountered
 // or no key matches the signature).
+int verify_file(const char* path) {
+    //ui->SetProgress(0.0);
 
-int verify_file(const char* path, const Certificate* pKeys, unsigned int numKeys) {
-    ui->SetProgress(0.0);
+    int numKeys;
+    Certificate* pKeys = load_keys(PUBLIC_KEYS_FILE, &numKeys);
+    if (pKeys == NULL) {
+        LOGE("Failed to load keys\n");
+        return INSTALL_CORRUPT;
+    }
+    LOGI("%d key(s) loaded from %s\n", numKeys, PUBLIC_KEYS_FILE);
 
     FILE* f = fopen(path, "rb");
     if (f == NULL) {
@@ -177,7 +186,7 @@ int verify_file(const char* path, const Certificate* pKeys, unsigned int numKeys
         so_far += size;
         double f = so_far / (double)signed_len;
         if (f > frac + 0.02 || size == so_far) {
-            ui->SetProgress(f);
+            //ui->SetProgress(f);
             frac = f;
         }
     }
@@ -205,6 +214,7 @@ int verify_file(const char* path, const Certificate* pKeys, unsigned int numKeys
         } else {
             LOGI("failed to verify against key %d\n", i);
         }
+		LOGI("i: %i, eocd_size: %i, RSANUMBYTES: %i\n", i, eocd_size, RSANUMBYTES);
     }
     free(eocd);
     LOGE("failed to verify whole-file signature\n");
@@ -319,7 +329,6 @@ load_keys(const char* filename, int* numKeys) {
                 LOGE("unexpected character between keys\n");
                 goto exit;
             }
-
             LOGI("read key e=%d hash=%d\n", key->exponent, cert->hash_len);
         }
     }

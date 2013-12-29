@@ -6,7 +6,7 @@ LOCAL_SRC_FILES := graphics.c events.c resources.c
 LOCAL_C_INCLUDES +=\
     external/libpng\
     external/zlib
-
+LOCAL_STATIC_LIBRARY := libpng
 LOCAL_MODULE := libminui
 
 # This used to compare against values in double-quotes (which are just
