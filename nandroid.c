@@ -126,9 +126,11 @@ static int mkyaffs2image_wrapper(const char* backup_path, const char* backup_fil
 static int do_tar_compress(char* command, int callback) {
     char buf[PATH_MAX];
 
+    set_perf_mode(1);
     FILE *fp = __popen(command, "r");
     if (fp == NULL) {
         ui_print("Unable to execute tar command!\n");
+        set_perf_mode(0);
         return -1;
     }
 
@@ -138,6 +140,7 @@ static int do_tar_compress(char* command, int callback) {
             nandroid_callback(buf);
     }
 
+    set_perf_mode(0);
     return __pclose(fp);
 }
 
@@ -525,9 +528,11 @@ static int unyaffs_wrapper(const char* backup_file_image, const char* backup_pat
 static int do_tar_extract(char* command, int callback) {
     char buf[PATH_MAX];
 
+    set_perf_mode(1);
     FILE *fp = __popen(command, "r");
     if (fp == NULL) {
         ui_print("Unable to execute tar command.\n");
+        set_perf_mode(0);
         return -1;
     }
 
@@ -537,6 +542,7 @@ static int do_tar_extract(char* command, int callback) {
             nandroid_callback(buf);
     }
 
+    set_perf_mode(0);
     return __pclose(fp);
 }
 
